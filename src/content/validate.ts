@@ -36,6 +36,7 @@ export function validateAndNormalizeInput(
   defaultStatus: SyncStatus
 ): NormalizedCheatContent {
   const parsed = rawCheatSchema.parse(item);
+  assertCheatTitleAndIntent(parsed.gameTitle.trim(), parsed.title.trim());
   const intro = truncate(parsed.intro ?? "", 350);
   const sections = normalizeSections(parsed.sections ?? []);
   const seoTitle = (parsed.seoTitle ?? parsed.title).trim();
@@ -46,8 +47,8 @@ export function validateAndNormalizeInput(
   return {
     title: parsed.title.trim(),
     gameTitle: parsed.gameTitle.trim(),
-    contentType: (parsed.contentType ?? "genel").trim(),
-    templateKey: (parsed.templateKey ?? "default").trim(),
+    contentType: "hile",
+    templateKey: (parsed.templateKey ?? "cheat-default").trim(),
     canonicalIntent: parsed.canonicalIntent.trim(),
     intro,
     sections,
@@ -91,6 +92,52 @@ function compactStrings(values: string[]): string[] {
 
 function truncate(value: string, maxLength: number): string {
   return value.length <= maxLength ? value : `${value.slice(0, maxLength - 1)}…`;
+}
+
+/**
+ * AI veya manuel girişte rehber/strateji başlıklarını erken yakalar.
+ * Site kalıbı: "{Oyun Adı} Hileleri: …"
+ */
+function assertCheatTitleAndIntent(gameTitle: string, title: string): void {
+  const t = title.trim();
+  const g = gameTitle.trim();
+  if (g.length === 0) return;
+  if (!t.toLowerCase().includes(g.toLowerCase())) {
+    throw new Error(
+      `Başlık oyun adını içermeli (CMS ile eşleşme için): "${g}" — alınan: "${t}"`
+    );
+  }
+  if (!/\bhileleri\b|\bhilesi\b|\bkod(lar)?\b|\bkonsol\b|\btrainer\b|\bglitch\b|\bduplicate\b|\bsonsuz\b|\bpara hilesi\b|\bcan hilesi\b/i.test(t)) {
+    throw new Error(
+      `Başlık oyun hilesi formatında olmalı (örn. "… Hileleri: …" veya kod/trainer): "${t}"`
+    );
+  }
+  const strategyOnly =
+    /\bstrateji\b|\brehber\b|\bekonomi yönetimi\b|\bkaynak toplama\b|\bwalkthrough\b|\bgörev rehberi\b/i.test(
+      t
+    ) &&
+    !/\bhileleri\b|\bhilesi\b/i.test(t);
+  if (strategyOnly) {
+    throw new Error(
+      `Başlık strateji/rehber gibi görünüyor; "… Hileleri: …" formatına çevir: "${t}"`
+    );
+  }
+  const afterColon = t.split(/:\s*/).slice(1).join(": ").trim();
+  if (afterColon.length > 0) {
+    const cheatHint =
+      /\b(kod|konsol|trainer|glitch|duplicate|sonsuz|para|can|cephane|mühimmat|ammo|xp|seviye|unlock|açık)\b/i.test(
+        afterColon
+      );
+    const badSubtitle =
+      /\bstrateji\b|\brehber\b|\bekonomi\b|\bkaynak toplama\b|\bzafer\b|\bustalaş\b|\boptimizasyon\b/i.test(
+        afterColon
+      );
+    if (badSubtitle && !cheatHint) {
+      throw new Error(
+        `Başlığın hile kısmı kod/trainer/sonsuz para gibi net bir hile konusu içermeli: "${t}"`
+      );
+    }
+  }
 }
 
 function normalizeStatus(input: string | undefined, fallback: SyncStatus): SyncStatus {

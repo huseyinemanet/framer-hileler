@@ -71,6 +71,8 @@ export async function upsertCheatItem(
     }
 
     logger.info(`game resolved: ${content.gameTitle} -> ${gameSlug}`);
+    const resolvedGameItem = ctx.gamesItems.find((item) => item.slug === gameSlug);
+    const gameReferenceValue = resolvedGameItem?.id ?? gameSlug;
 
     const existing = findExistingCheatItem({
       items: ctx.hacksItems,
@@ -81,7 +83,7 @@ export async function upsertCheatItem(
     const fieldData = mapCheatToFramerFieldData({
       content,
       hacksFieldsByName: ctx.hacksFieldsByName,
-      gameReferenceSlug: gameSlug
+      gameReferenceValue
     });
 
     const payload: Record<string, unknown> = {

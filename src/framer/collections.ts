@@ -4,6 +4,7 @@ export interface FramerField {
   id: string;
   name: string;
   type: string;
+  cases?: Array<{ id: string; name: string }>;
 }
 
 export interface FramerItem {

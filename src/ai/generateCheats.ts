@@ -9,13 +9,25 @@ const rawCheatFromAiSchema = z.object({
   canonicalIntent: z.string().min(1),
   intro: z.string().optional(),
   sections: z
-    .array(
-      z.object({
-        heading: z.string().optional(),
-        body: z.string().optional()
-      })
-    )
-    .optional(),
+    .preprocess((value) => {
+      if (Array.isArray(value)) return value;
+      if (value && typeof value === "object") {
+        const obj = value as Record<string, unknown>;
+        if (Array.isArray(obj.sections)) return obj.sections;
+        const candidates = ["section1", "section2", "section3"]
+          .map((k) => obj[k])
+          .filter(Boolean);
+        if (candidates.length > 0) return candidates;
+      }
+      return value;
+    }, z
+      .array(
+        z.object({
+          heading: z.string().optional(),
+          body: z.string().optional()
+        })
+      )
+      .optional()),
   warnings: z.array(z.string()).optional(),
   internalLinkHints: z.array(z.string()).optional(),
   seoTitle: z.string().optional(),
@@ -49,7 +61,7 @@ interface AnthropicMessageResponse {
 
 /**
  * Anthropic Messages API — JSON çıktı (prompt ile zorlanır; gerekirse ```json``` temizlenir).
- * İçerik: yasal oyun ipuçları / rehber tonu (hile yazılımı değil).
+ * Sadece **oyun hileleri** (kod, konsol, trainer tablosu, bilinen glitch vb.) — strateji/rehber değil.
  */
 export async function generateCheatsWithAnthropic(
   params: GenerateCheatsParams
@@ -59,25 +71,43 @@ export async function generateCheatsWithAnthropic(
       ? params.gameContextLines.join("\n")
       : "(Ek bağlam yok)";
 
-  const system = `Sen bir oyun rehber sitesi için Türkçe içerik yazıyorsun.
-Kurallar:
-- Sadece yasal oyun içi ipuçları, strateji ve rehber tonu kullan; hile yazılımı, exploit veya ToS ihlali önerme.
-- Çıktı YALNIZCA geçerli bir JSON nesnesi olsun; markdown kod bloğu veya açıklama metni ekleme.
-- Şema: {"cheats":[...]} — cheats dizisinde en az ${params.cheatsCount} öğe olsun (tercihen tam ${params.cheatsCount}).
-- Her öğede zorunlu: title, gameTitle, canonicalIntent, externalId.
-- gameTitle alanını kullanıcı mesajındaki JSON.stringify ile verilen tam metinle doldur.
-- externalId benzersiz olsun: ai-${params.gameSlug}-<kısa-özet> formatında küçük harf, tire ile.
-- templateKey: "cheat-default", contentType: kısa İngilizce etiket (ör. tips, build, economy).
-- Her kayıtta Section 1 ve 2 için hem heading hem body dolu olsun; Section 3 opsiyonel.
-- warnings: oyuncu için güvenli/etik uyarılar (en az 1 madde).`;
+  const gameQuoted = JSON.stringify(params.gameDisplayTitle);
+
+  const system = `Sen Türkçe bir "oyun hileleri" sitesi için içerik üretiyorsun. Çıktı SADECE gerçek hile içeriği olmalı.
+
+ZORUNLU TÜR — her kayıt şunlardan en az birini içermeli:
+- PC/konsol hile kodları veya tuş kombinasyonları (oyunun resmi / yaygın bilinen hileleri)
+- Konsol / komut satırı / debug menüsü ile ilgili bilinen yöntemler (varsa)
+- Trainer tablosu: hangi tuş ne yapar (trainer kullanımı risklidir; yalnızca bilgilendirme + uyarı)
+- Bilinen para / can / cephane / XP gibi **hile** yöntemleri (yalnızca oyun içi veya yaygın kaynaklarda geçenler)
+- Yaygın bilinen glitch/duplicate **hile**leri (çok kısa, risk uyarısı ile)
+
+KESİNLİKLE YASAK — bunları yazma (bunlar rehber/strateji, hile değil):
+- "strateji", "rehber", "nasıl kazanılır", build/meta, görev/walkthrough, combat timing, "ekonomi yönetimi", "kaynak toplama", genel oynanış ipuçları
+- Sadece "daha iyi oyna" anlatan içerik; mutlaka hile/kod/trainer/glitch odağı olmalı
+
+BAŞLIK FORMATI (site ile uyumlu, birebir kalıp):
+- title = (gameTitle metninin kendisi, tırnaksız) + " Hileleri: " + kısa hile konusu
+  Örnek: Ghost of Tsushima Hileleri: Sınırsız Para ve Kaynak Kodları
+
+canonicalIntent: küçük harf, Türkçe, hile konusu (ör. "ghost of tsushima para hilesi kodlari").
+
+Çıktı YALNIZCA geçerli JSON nesnesi; markdown veya açıklama yok.
+Şema: {"cheats":[...]} — en az ${params.cheatsCount} öğe (tercihen tam ${params.cheatsCount}).
+Her öğede zorunlu: title, gameTitle, canonicalIntent, externalId.
+gameTitle = kullanıcı mesajındaki JSON.stringify ile verilen tam metin.
+externalId: ai-${params.gameSlug}-<özet> küçük harf tire.
+templateKey: "cheat-default", contentType: "hile".
+Section 1 ve 2: heading+body dolu; Section 3 opsiyonel. Body'lerde mümkünse kodları liste veya satır satır ver.
+warnings: en az 1 madde (trainer/online riski, kayıt bozulması, güncelleme ile çalışmama vb.).`;
 
   const user = `Oyun slug: ${params.gameSlug}
-gameTitle için kullanman gereken TAM metin (birebir): ${JSON.stringify(params.gameDisplayTitle)}
+gameTitle (birebir): ${gameQuoted}
 
-CMS bağlamı:
+CMS bağlamı (sadece bağlam; hile yoksa genel bilinen hileleri kullan):
 ${contextBlock}
 
-Bu oyun için ${params.cheatsCount} ayrı rehber/hile (oyun içi ipuçları) yaz.`;
+Bu oyun için ${params.cheatsCount} AYRI oyun hilesi makalesi üret. Her biri farklı hile konusu olsun (ör. para, can, cephane, farklı kod setleri). Strateji/rehber yazma.`;
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -89,7 +119,7 @@ Bu oyun için ${params.cheatsCount} ayrı rehber/hile (oyun içi ipuçları) yaz
     body: JSON.stringify({
       model: params.model,
       max_tokens: 8192,
-      temperature: 0.7,
+      temperature: 0.45,
       system,
       messages: [{ role: "user", content: user }]
     })

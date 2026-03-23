@@ -52,6 +52,8 @@ Her öğede en kritik alanlar:
 - `canonicalIntent`
 - `externalId`
 
+Başlık kuralı (AI + dosya modu): `title` içinde **tam `gameTitle` metni** ve **“Hileleri” / “Hilesi” / kod-konsol-trainer** gibi net hile sinyali olmalı; strateji/rehber başlıkları reddedilir.
+
 Section kuralı:
 - `Section 1` heading+body zorunlu
 - `Section 2` heading+body zorunlu

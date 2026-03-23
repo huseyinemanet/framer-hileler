@@ -1,99 +1,96 @@
 [
   {
-    "title": "Valorant Aim Geliştirme Hilesi",
+    "title": "Valorant Hileleri: Konsol Komutları ve Bilinen Kodlar (bilgi amaçlı)",
     "gameTitle": "Valorant",
-    "contentType": "aim",
+    "contentType": "hile",
     "templateKey": "cheat-default",
-    "canonicalIntent": "valorant aim gelistirme",
-    "intro": "Daha stabil nişan almak için crosshair, sens ve rutin ayarlarını tek akışta optimize et.",
+    "canonicalIntent": "valorant konsol kodlari hile",
+    "intro": "Valorant’ta resmi maçlarda hile yoktur; bazı özel ortamlarda kullanılan debug/komut örnekleri yalnızca bilgilendirme içindir.",
     "sections": [
       {
-        "heading": "Crosshair ve Sens Temeli",
-        "body": "Tek bir sens değerinde en az 7 gün kal. Crosshair gap ve opacity değerlerini sabit tut."
+        "heading": "Önemli uyarı",
+        "body": "Ranked ve resmi sunucularda hile/komut kullanımı yasaktır ve kalıcı ban riski taşır. Bu metin yalnızca teknik bilgi içindir."
       },
       {
-        "heading": "Antrenman Rutini",
-        "body": "Günde 15 dakika tracking + 15 dakika flick çalış. Her seans sonunda kısa VOD analizi yap."
+        "heading": "Örnek komut formatı (oyuna göre değişir)",
+        "body": "Bazı oyunlarda konsol `~` ile açılır; burada gerçek kod yerine yer tutucu kullanın: `sv_cheats 1` benzeri yapılar başka motorlara aittir—Valorant için geçerli değildir."
       },
       {
-        "heading": "Maç İçi Uygulama",
-        "body": "İlk 3 round agresif oynamadan bilgi topla. Aim düştüğünde tempo düşür ve utility kullan."
+        "heading": "Güvenli alternatif",
+        "body": "Pratik için Range ve özel oyun odalarını kullanın; üçüncü parti yazılım kullanmayın."
       }
     ],
     "warnings": [
-      "Üçüncü parti yazılım kullanma.",
-      "Hesap güvenliği için 2FA aktif et."
+      "Hile yazılımı kullanmayın.",
+      "Hesap güvenliği için 2FA açık tutun."
     ],
-    "internalLinkHints": [
-      "valorant-crosshair-rehberi",
-      "valorant-sens-nasil-bulunur"
-    ],
-    "seoTitle": "Valorant Aim Geliştirme: Pratik Hileler",
-    "seoDescription": "Valorant aim geliştirmek için uygulanabilir rutin, crosshair ve sens ipuçları.",
+    "internalLinkHints": ["valorant-pratik-mod"],
+    "seoTitle": "Valorant Hileleri ve Kodlar Hakkında Bilgi",
+    "seoDescription": "Valorant’ta hile ve komutlar hakkında risk uyarıları ve bilgilendirme.",
     "externalId": "cheat-valorant-aim-001",
     "status": "review",
     "thumbnailUrl": "https://images.unsplash.com/photo-1542751371-adc38448a05e",
     "aiUpdatedAt": "2026-03-23T07:30:00.000Z"
   },
   {
-    "title": "CS2 Spray Kontrol Hilesi",
+    "title": "Counter Strike 2 Hileleri: Konsol ve Pratik Sunucu Komutları",
     "gameTitle": "Counter Strike 2",
-    "contentType": "spray-control",
+    "contentType": "hile",
     "templateKey": "cheat-default",
-    "canonicalIntent": "cs2 spray kontrol",
-    "intro": "Spray pattern ezberini kısa ama tekrarlı bir rutinle kalıcı hale getir.",
+    "canonicalIntent": "counter strike 2 konsol kodlari",
+    "intro": "CS2’de yalnızca kendi sunucunuzda veya izin verilen pratik ortamlarda kullanılabilecek konsol komutlarına genel bakış.",
     "sections": [
       {
-        "heading": "Pattern Ezberi",
-        "body": "AK ve M4 için ayrı çalışma listesi tut. Her gün 50 tekrar yap."
+        "heading": "Sunucu ve sv_cheats",
+        "body": "Yerel/pratik sunucuda `sv_cheats 1` açılabilir; resmi maçlarda geçerli değildir. Her komut güncellemeyle değişebilir."
       },
       {
-        "heading": "Transfer Pratiği",
-        "body": "Duvar hedeflerinden iki hedefe geçiş yaparak spray transfer çalış."
+        "heading": "Örnek komutlar (pratik)",
+        "body": "`noclip`, `god`, `impulse 101` gibi komutlar klasik Source geleneğindedir; CS2 sürümünde kullanılabilirlik için güncel wiki doğrulaması yapın."
       }
     ],
-    "warnings": [],
-    "internalLinkHints": ["cs2-crosshair-kodu", "cs2-aim-rutini"],
+    "warnings": ["Resmi maçlarda hile kullanımı ban sebebidir."],
+    "internalLinkHints": ["cs2-konsol-rehberi"],
     "externalId": "cheat-cs2-spray-001",
     "status": "draft"
   },
   {
-    "title": "CS2 Spray Kontrol Hilesi (Guncel)",
+    "title": "Counter Strike 2 Hileleri: Konsol Komutları (Güncel)",
     "gameTitle": "Counter Strike 2",
-    "contentType": "spray-control",
+    "contentType": "hile",
     "templateKey": "cheat-default",
-    "canonicalIntent": "cs2 spray kontrol",
-    "intro": "Ayni externalId ile gelen guncel icerik update yolunu test eder.",
+    "canonicalIntent": "counter strike 2 konsol kodlari",
+    "intro": "Aynı externalId ile güncelleme yolunu test eden kısa konsol/hile bilgi metni.",
     "sections": [
       {
-        "heading": "Pattern Ezberi V2",
-        "body": "Ayni patterni daha kisa ama daha sik araliklarla calis."
+        "heading": "sv_cheats ve pratik",
+        "body": "Yerel sunucuda `sv_cheats 1` sonrası komutların listesi oyun güncellemesine göre değişir; patch notlarını kontrol edin."
       },
       {
-        "heading": "Transfer Pratigi V2",
-        "body": "Iki hedef arasi gecis hizini tur bazli kayit altina al."
+        "heading": "Doğrulama",
+        "body": "Komut girmeden önce `help` veya konsol öneri listesi ile mevcut komutları doğrulayın."
       }
     ],
-    "warnings": ["DPI ve sens degerini ayni anda degistirme."],
-    "internalLinkHints": ["cs2-spray-pattern-haritasi"],
+    "warnings": ["VAC ve rekabet kurallarına uyun."],
+    "internalLinkHints": ["cs2-pratik-sunucu"],
     "externalId": "cheat-cs2-spray-001",
     "status": "review"
   },
   {
-    "title": "CS2 Spray Kontrol",
+    "title": "Counter Strike 2 Hileleri: Cephane ve Para Kodları (pratik sunucu)",
     "gameTitle": "Counter Strike 2",
-    "contentType": "spray-control",
+    "contentType": "hile",
     "templateKey": "cheat-default",
-    "canonicalIntent": "cs2 spray kontrol",
-    "intro": "Farkli externalId ile duplicate fallback davranisini test eder.",
+    "canonicalIntent": "counter strike 2 para cephane hilesi",
+    "intro": "Farklı externalId ile duplicate fallback testi; içerik yalnızca pratik sunucu/konsol bağlamındadır.",
     "sections": [
       {
-        "heading": "Kontrol Ozeti",
-        "body": "Canonical intent ve slug/title fallback ile esit icerigi bulur."
+        "heading": "Para ve cephane",
+        "body": "Pratik ortamda `impulse 101` veya sürüme özel ekonomi komutları kullanılabilir; ranked’da geçersizdir."
       },
       {
-        "heading": "Uygulama",
-        "body": "Create yerine update karari vermesi beklenir."
+        "heading": "Not",
+        "body": "Canonical intent ve başlık eşleşmesiyle mevcut kayıt güncellenmelidir."
       }
     ],
     "warnings": [],
