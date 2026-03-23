@@ -55,6 +55,13 @@ export interface SyncResult {
   publishedCount: number;
   relationMissingCount: number;
   dryRun: boolean;
+  /** --ai modunda seçilen oyun ve eşik bilgisi */
+  aiMeta?: {
+    selectedGameSlug: string;
+    selectedGameTitle: string;
+    cheatsForThatGame: number;
+    threshold: number;
+  };
 }
 
 export interface UpsertOutcome {

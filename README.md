@@ -1,6 +1,9 @@
 # Framer Hileler Sync
 
-Framer CMS içindeki `Hileler` koleksiyonuna JSON input ile güvenli upsert yapan Node.js + TypeScript sync pipeline.
+Framer CMS içindeki `Hileler` koleksiyonuna güvenli upsert yapan Node.js + TypeScript pipeline.
+
+- **file**: JSON dosyasından içerik
+- **ai**: `Oyunlar` + mevcut `Hileler` ilişkisine göre **eşik altı** bir oyun seçer, **OpenAI** ile o oyuna özel hile/rehber içeriği üretir, Framer’a yazar
 
 Varsayılan çalışma modu **dry-run**'dır. Yazma yapmak için `--write` zorunludur.
 
@@ -15,14 +18,29 @@ Varsayılan çalışma modu **dry-run**'dır. Yazma yapmak için `--write` zorun
 - `DEFAULT_STATUS` (`draft|review|published`)
 - `STRICT_GAME_RELATION` (`true|false`)
 - `SYNC_INPUT_PATH` (default: `./data/sample-cheats.json`)
+- `SYNC_SOURCE` (`file` | `ai`) — `ai` ise CLI’da `--ai` olmadan da AI modu (override: `--file`)
+- `OPENAI_API_KEY`, `OPENAI_MODEL` (AI modu)
+- `HACKS_PER_GAME_THRESHOLD` — oyuna bağlı hile sayısı bundan küçükse öncelikli aday
+- `AI_CHEATS_PER_RUN` — her koşuda üretilecek kayıt sayısı
+- `AI_ROTATION_GRANULARITY` (`daily` | `hourly` | `random`) — aynı gün/saat içinde hangi oyunun sırası geldiği
+- `AI_ROTATION_SEED` — rotasyon karıştırıcı (farklı repo/cron için)
 
 ## Çalıştırma
 
 - `npm install`
-- Dry-run: `npm run sync:hacks -- --input ./data/sample-cheats.json`
-- Yazma (sync only): `npm run sync:hacks -- --write --input ./data/sample-cheats.json`
+- **Dosya modu** dry-run: `npm run sync:hacks -- --input ./data/sample-cheats.json`
+- **Dosya modu** yazma: `npm run sync:hacks -- --write --input ./data/sample-cheats.json`
+- **AI modu** — hangi oyunun seçildiğini görmek (OpenAI çağrılmaz): `npm run sync:hacks -- --ai`
+- **AI modu** yazma: `npm run sync:hacks -- --ai --write`
+- `SYNC_SOURCE=ai` iken tek seferlik dosya modu: `npm run sync:hacks -- --file --input ./data/sample-cheats.json`
 - Yazma + publish: `npm run sync:hacks -- --write --publish --input ./data/sample-cheats.json`
 - Yazma + publish + deploy: `npm run sync:hacks -- --write --publish --deploy --input ./data/sample-cheats.json`
+
+`npm run run:daily` — `.env` içinde `SYNC_SOURCE=ai` ise günlük AI senkronu çalışır.
+
+### GitHub Actions
+
+Repo değişkeni `SYNC_SOURCE=ai` yapınca workflow `OPENAI_API_KEY` secret’ı ve yukarıdaki AI env’lerini kullanır. Dosya modu için `SYNC_SOURCE=file` (varsayılan) bırakın.
 
 ## Input Format
 

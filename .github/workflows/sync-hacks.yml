@@ -25,7 +25,12 @@ jobs:
         run: npm run typecheck
 
       - name: Sync hacks
-        run: npm run sync:hacks -- --write --input "${{ vars.SYNC_INPUT_PATH || './data/sample-cheats.json' }}"
+        run: |
+          if [ "${{ vars.SYNC_SOURCE || 'file' }}" = "ai" ]; then
+            npm run sync:hacks -- --write --ai
+          else
+            npm run sync:hacks -- --write --input "${{ vars.SYNC_INPUT_PATH || './data/sample-cheats.json' }}"
+          fi
         env:
           FRAMER_API_KEY: ${{ secrets.FRAMER_API_KEY }}
           FRAMER_PROJECT_URL: ${{ secrets.FRAMER_PROJECT_URL }}
@@ -33,3 +38,10 @@ jobs:
           FRAMER_GAMES_COLLECTION_NAME: ${{ vars.FRAMER_GAMES_COLLECTION_NAME || 'Oyunlar' }}
           DEFAULT_STATUS: ${{ vars.DEFAULT_STATUS || 'draft' }}
           STRICT_GAME_RELATION: ${{ vars.STRICT_GAME_RELATION || 'true' }}
+          SYNC_SOURCE: ${{ vars.SYNC_SOURCE || 'file' }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-4o-mini' }}
+          HACKS_PER_GAME_THRESHOLD: ${{ vars.HACKS_PER_GAME_THRESHOLD || '3' }}
+          AI_CHEATS_PER_RUN: ${{ vars.AI_CHEATS_PER_RUN || '2' }}
+          AI_ROTATION_GRANULARITY: ${{ vars.AI_ROTATION_GRANULARITY || 'daily' }}
+          AI_ROTATION_SEED: ${{ vars.AI_ROTATION_SEED || 'github-actions' }}
