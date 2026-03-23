@@ -14,10 +14,11 @@ const envSchema = z.object({
     .optional()
     .transform((value) => value !== "false"),
   SYNC_INPUT_PATH: z.string().default("./data/sample-cheats.json"),
-  /** file: JSON input; ai: eşik + rotasyon ile oyun seç, OpenAI üret */
+  /** file: JSON input; ai: eşik + rotasyon ile oyun seç, Anthropic üret */
   SYNC_SOURCE: z.enum(["file", "ai"]).default("file"),
-  OPENAI_API_KEY: z.string().optional(),
-  OPENAI_MODEL: z.string().default("gpt-4o-mini"),
+  ANTHROPIC_API_KEY: z.string().optional(),
+  /** Örn. claude-3-5-haiku-20241022 — güncel listeyi Anthropic konsolundan doğrula */
+  ANTHROPIC_MODEL: z.string().default("claude-3-5-haiku-20241022"),
   /** Bu oyuna bağlı hile sayısı bu değerin altındaysa AI hedef adayı */
   HACKS_PER_GAME_THRESHOLD: z
     .string()

@@ -3,7 +3,7 @@
 Framer CMS içindeki `Hileler` koleksiyonuna güvenli upsert yapan Node.js + TypeScript pipeline.
 
 - **file**: JSON dosyasından içerik
-- **ai**: `Oyunlar` + mevcut `Hileler` ilişkisine göre **eşik altı** bir oyun seçer, **OpenAI** ile o oyuna özel hile/rehber içeriği üretir, Framer’a yazar
+- **ai**: `Oyunlar` + mevcut `Hileler` ilişkisine göre **eşik altı** bir oyun seçer, **Anthropic (Claude)** ile o oyuna özel hile/rehber içeriği üretir, Framer’a yazar
 
 Varsayılan çalışma modu **dry-run**'dır. Yazma yapmak için `--write` zorunludur.
 
@@ -19,7 +19,7 @@ Varsayılan çalışma modu **dry-run**'dır. Yazma yapmak için `--write` zorun
 - `STRICT_GAME_RELATION` (`true|false`)
 - `SYNC_INPUT_PATH` (default: `./data/sample-cheats.json`)
 - `SYNC_SOURCE` (`file` | `ai`) — `ai` ise CLI’da `--ai` olmadan da AI modu (override: `--file`)
-- `OPENAI_API_KEY`, `OPENAI_MODEL` (AI modu)
+- `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` (AI modu; model adını Anthropic konsolundan doğrula)
 - `HACKS_PER_GAME_THRESHOLD` — oyuna bağlı hile sayısı bundan küçükse öncelikli aday
 - `AI_CHEATS_PER_RUN` — her koşuda üretilecek kayıt sayısı
 - `AI_ROTATION_GRANULARITY` (`daily` | `hourly` | `random`) — aynı gün/saat içinde hangi oyunun sırası geldiği
@@ -30,7 +30,7 @@ Varsayılan çalışma modu **dry-run**'dır. Yazma yapmak için `--write` zorun
 - `npm install`
 - **Dosya modu** dry-run: `npm run sync:hacks -- --input ./data/sample-cheats.json`
 - **Dosya modu** yazma: `npm run sync:hacks -- --write --input ./data/sample-cheats.json`
-- **AI modu** — hangi oyunun seçildiğini görmek (OpenAI çağrılmaz): `npm run sync:hacks -- --ai`
+- **AI modu** — hangi oyunun seçildiğini görmek (Anthropic çağrılmaz): `npm run sync:hacks -- --ai`
 - **AI modu** yazma: `npm run sync:hacks -- --ai --write`
 - `SYNC_SOURCE=ai` iken tek seferlik dosya modu: `npm run sync:hacks -- --file --input ./data/sample-cheats.json`
 - Yazma + publish: `npm run sync:hacks -- --write --publish --input ./data/sample-cheats.json`
@@ -40,7 +40,7 @@ Varsayılan çalışma modu **dry-run**'dır. Yazma yapmak için `--write` zorun
 
 ### GitHub Actions
 
-Repo değişkeni `SYNC_SOURCE=ai` yapınca workflow `OPENAI_API_KEY` secret’ı ve yukarıdaki AI env’lerini kullanır. Dosya modu için `SYNC_SOURCE=file` (varsayılan) bırakın.
+Repo değişkeni `SYNC_SOURCE=ai` yapınca workflow `ANTHROPIC_API_KEY` secret’ı ve yukarıdaki AI env’lerini kullanır. Dosya modu için `SYNC_SOURCE=file` (varsayılan) bırakın.
 
 ## Input Format
 

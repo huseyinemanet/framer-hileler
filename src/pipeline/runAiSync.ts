@@ -1,4 +1,4 @@
-import { generateCheatsWithOpenAI } from "../ai/generateCheats.js";
+import { generateCheatsWithAnthropic } from "../ai/generateCheats.js";
 import type { RawCheatInput, SyncResult } from "../content/types.js";
 import { connectFramer } from "../framer/client.js";
 import type { FramerField, FramerItem } from "../framer/collections.js";
@@ -70,7 +70,7 @@ export async function runAiSync(options: RunAiSyncOptions): Promise<SyncResult> 
 
     if (options.dryRun) {
       logger.warn(
-        "dry-run + --ai: OpenAI çağrılmıyor (maliyet önlemi). Gerçek üretim için --write kullan."
+        "dry-run + --ai: Anthropic çağrılmıyor (maliyet önlemi). Gerçek üretim için --write kullan."
       );
       return {
         total: 0,
@@ -90,14 +90,14 @@ export async function runAiSync(options: RunAiSyncOptions): Promise<SyncResult> 
       };
     }
 
-    const apiKey = env.OPENAI_API_KEY?.trim();
+    const apiKey = env.ANTHROPIC_API_KEY?.trim();
     if (!apiKey || apiKey.length === 0) {
-      throw new Error("OPENAI_API_KEY eksik. AI yazımı için .env içinde tanımlayın.");
+      throw new Error("ANTHROPIC_API_KEY eksik. AI yazımı için .env içinde tanımlayın.");
     }
 
-    const rawItems = await generateCheatsWithOpenAI({
+    const rawItems = await generateCheatsWithAnthropic({
       apiKey,
-      model: env.OPENAI_MODEL,
+      model: env.ANTHROPIC_MODEL,
       gameDisplayTitle: pick.displayTitle,
       gameSlug: pick.slug,
       cheatsCount: env.AI_CHEATS_PER_RUN,

@@ -30,6 +30,8 @@ const aiResponseSchema = z.object({
   cheats: z.array(rawCheatFromAiSchema).min(1)
 });
 
+const ANTHROPIC_API_VERSION = "2023-06-01";
+
 export interface GenerateCheatsParams {
   apiKey: string;
   model: string;
@@ -40,11 +42,16 @@ export interface GenerateCheatsParams {
   gameContextLines: string[];
 }
 
+interface AnthropicMessageResponse {
+  content?: Array<{ type: string; text?: string }>;
+  error?: { type?: string; message?: string };
+}
+
 /**
- * OpenAI Chat Completions — JSON çıktı.
+ * Anthropic Messages API — JSON çıktı (prompt ile zorlanır; gerekirse ```json``` temizlenir).
  * İçerik: yasal oyun ipuçları / rehber tonu (hile yazılımı değil).
  */
-export async function generateCheatsWithOpenAI(
+export async function generateCheatsWithAnthropic(
   params: GenerateCheatsParams
 ): Promise<RawCheatInput[]> {
   const contextBlock =
@@ -55,7 +62,7 @@ export async function generateCheatsWithOpenAI(
   const system = `Sen bir oyun rehber sitesi için Türkçe içerik yazıyorsun.
 Kurallar:
 - Sadece yasal oyun içi ipuçları, strateji ve rehber tonu kullan; hile yazılımı, exploit veya ToS ihlali önerme.
-- Çıktı YALNIZCA geçerli bir JSON nesnesi olsun, markdown veya açıklama metni ekleme.
+- Çıktı YALNIZCA geçerli bir JSON nesnesi olsun; markdown kod bloğu veya açıklama metni ekleme.
 - Şema: {"cheats":[...]} — cheats dizisinde en az ${params.cheatsCount} öğe olsun (tercihen tam ${params.cheatsCount}).
 - Her öğede zorunlu: title, gameTitle, canonicalIntent, externalId.
 - gameTitle alanını kullanıcı mesajındaki JSON.stringify ile verilen tam metinle doldur.
@@ -72,50 +79,74 @@ ${contextBlock}
 
 Bu oyun için ${params.cheatsCount} ayrı rehber/hile (oyun içi ipuçları) yaz.`;
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${params.apiKey}`,
-      "Content-Type": "application/json"
+      "x-api-key": params.apiKey,
+      "anthropic-version": ANTHROPIC_API_VERSION,
+      "content-type": "application/json"
     },
     body: JSON.stringify({
       model: params.model,
-      temperature: 0.7,
       max_tokens: 8192,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user }
-      ]
+      temperature: 0.7,
+      system,
+      messages: [{ role: "user", content: user }]
     })
   });
 
+  const rawBody = await res.text();
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`OpenAI API error ${res.status}: ${text.slice(0, 500)}`);
+    throw new Error(`Anthropic API error ${res.status}: ${rawBody.slice(0, 500)}`);
   }
 
-  const json = (await res.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
-  };
-  const content = json.choices?.[0]?.message?.content;
-  if (!content || typeof content !== "string") {
-    throw new Error("OpenAI yanıtında içerik yok.");
+  let json: AnthropicMessageResponse;
+  try {
+    json = JSON.parse(rawBody) as AnthropicMessageResponse;
+  } catch {
+    throw new Error("Anthropic yanıtı JSON değil.");
   }
+
+  if (json.error?.message) {
+    throw new Error(`Anthropic API: ${json.error.message}`);
+  }
+
+  const textBlocks =
+    json.content
+      ?.filter((b) => b.type === "text")
+      .map((b) => b.text ?? "")
+      .join("") ?? "";
+
+  if (!textBlocks.trim()) {
+    throw new Error("Anthropic yanıtında metin içeriği yok.");
+  }
+
+  const jsonText = extractJsonObjectString(textBlocks);
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(content) as unknown;
+    parsed = JSON.parse(jsonText) as unknown;
   } catch {
-    throw new Error("OpenAI JSON parse edilemedi.");
+    throw new Error("Anthropic çıktısı JSON olarak parse edilemedi.");
   }
 
   const validated = aiResponseSchema.parse(parsed);
   const cheats = validated.cheats as RawCheatInput[];
   if (cheats.length < params.cheatsCount) {
     throw new Error(
-      `OpenAI yeterli kayıt üretmedi: beklenen ${params.cheatsCount}, gelen ${cheats.length}`
+      `Anthropic yeterli kayıt üretmedi: beklenen ${params.cheatsCount}, gelen ${cheats.length}`
     );
   }
   return cheats.slice(0, params.cheatsCount);
+}
+
+/** ```json ... ``` veya çevresindeki metni ayıklar. */
+function extractJsonObjectString(text: string): string {
+  const trimmed = text.trim();
+  const fenced = /^```(?:json)?\s*([\s\S]*?)```$/m.exec(trimmed);
+  if (fenced?.[1]) return fenced[1].trim();
+  const start = trimmed.indexOf("{");
+  const end = trimmed.lastIndexOf("}");
+  if (start >= 0 && end > start) return trimmed.slice(start, end + 1);
+  return trimmed;
 }
