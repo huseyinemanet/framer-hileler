@@ -1,4 +1,8 @@
-import { findExistingCheatItem, resolveGameReferenceSlug } from "../content/dedupe.js";
+import {
+  findExistingCheatItem,
+  resolveGameReferenceSlug,
+  resolveGameTitleFieldId
+} from "../content/dedupe.js";
 import { mapCheatToFramerFieldData } from "../content/mapper.js";
 import type { NormalizedCheatContent, UpsertOutcome } from "../content/types.js";
 import type {
@@ -45,9 +49,11 @@ export async function upsertCheatItem(
         };
       }
       gameSlug = makeSlug(content.gameTitle);
-      const gameTitleField = ctx.gamesFieldsByName.get("Title");
-      if (!gameTitleField) {
-        throw new Error(`"Oyunlar" collection has no "Title" field.`);
+      const gameTitleFieldId = resolveGameTitleFieldId(ctx.gamesFieldsByName);
+      if (!gameTitleFieldId) {
+        throw new Error(
+          '"Oyunlar" collection has no supported game title field (Title, Adı, Name, İsim).'
+        );
       }
       if (ctx.dryRun) {
         logger.warn(`dry-run: would create missing game "${content.gameTitle}"`);
@@ -56,7 +62,7 @@ export async function upsertCheatItem(
           {
             slug: gameSlug,
             fieldData: {
-              [gameTitleField.id]: { type: "string", value: content.gameTitle }
+              [gameTitleFieldId]: { type: "string", value: content.gameTitle }
             }
           }
         ]);

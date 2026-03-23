@@ -2,6 +2,8 @@ import type { FramerField, FramerItem } from "../framer/collections.js";
 import { normalizeForDedupe } from "../utils/slug.js";
 import type { NormalizedCheatContent } from "./types.js";
 
+const GAME_TITLE_FIELD_CANDIDATES = ["Title", "Adı", "Name", "İsim"] as const;
+
 export function findExistingCheatItem(params: {
   items: FramerItem[];
   fieldsByName: Map<string, FramerField>;
@@ -44,7 +46,7 @@ export function resolveGameReferenceSlug(params: {
   gamesItems: FramerItem[];
   gamesFieldsByName: Map<string, FramerField>;
 }): string | null {
-  const titleFieldId = getFieldId(params.gamesFieldsByName, "Title", false);
+  const titleFieldId = resolveGameTitleFieldId(params.gamesFieldsByName);
   const target = normalizeForDedupe(params.gameTitle);
   for (const game of params.gamesItems) {
     const slugCandidate = normalizeForDedupe(game.slug ?? "");
@@ -53,6 +55,16 @@ export function resolveGameReferenceSlug(params: {
       const title = normalizeForDedupe(getStringField(game, titleFieldId));
       if (title === target) return game.slug;
     }
+  }
+  return null;
+}
+
+export function resolveGameTitleFieldId(
+  fieldsByName: Map<string, FramerField>
+): string | null {
+  for (const candidate of GAME_TITLE_FIELD_CANDIDATES) {
+    const fieldId = getFieldId(fieldsByName, candidate, false);
+    if (fieldId) return fieldId;
   }
   return null;
 }
