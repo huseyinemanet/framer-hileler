@@ -64,6 +64,7 @@ Warnings / Internal Link Hints standardı:
 
 ## Bilinen Sınırlamalar
 
+- CMS’te **Slug** sütunu görünse bile Server API `getFields()` içinde her zaman ayrı bir alan olarak gelmeyebilir. Slug, item üzerindeki `slug` alanı ile set edilir; `getFields()`’te `Slug` varsa ek olarak `fieldData`’ya da yazılır.
 - Framer API transactional değil; bu yüzden item-bazlı retry + kısmi hata izolasyonu uygulanır.
 - Thumbnail alanı URL bazlı yazılır. Asset upload akışı TODO.
 - `STRICT_GAME_RELATION=true` varsayılanı önerilir. Bu modda eksik game relation item'i create etmez, skip+raporlar.

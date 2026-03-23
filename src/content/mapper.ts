@@ -17,9 +17,8 @@ export function mapCheatToFramerFieldData(
   const warningsText = content.warnings.join("\n");
   const internalHintsText = content.internalLinkHints.join("\n");
 
-  return {
+  const fieldData: Record<string, FieldValue> = {
     [fieldId(hacksFieldsByName, "Title")]: value("string", content.title),
-    [fieldId(hacksFieldsByName, "Slug")]: value("string", content.slug),
     [fieldId(hacksFieldsByName, "Thumbnail")]: value(
       "image",
       content.thumbnailUrl ?? ""
@@ -86,6 +85,13 @@ export function mapCheatToFramerFieldData(
     ),
     [fieldId(hacksFieldsByName, "Error")]: value("string", errorMessage ?? "")
   };
+
+  const slugField = hacksFieldsByName.get("Slug");
+  if (slugField) {
+    fieldData[slugField.id] = value("string", content.slug);
+  }
+
+  return fieldData;
 }
 
 function fieldId(fields: Map<string, FramerField>, name: string): string {

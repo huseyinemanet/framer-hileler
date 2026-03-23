@@ -33,7 +33,6 @@ export interface ValidatedCollectionContext {
 
 const REQUIRED_HACKS_FIELDS = [
   "Title",
-  "Slug",
   "Thumbnail",
   "Game",
   "Content Type",
@@ -85,6 +84,9 @@ export async function getCollectionsContext(
       );
     }
   }
+
+  // Slug is shown in the CMS but Framer often exposes it only as CollectionItem.slug /
+  // addItems({ slug }), not as a row in getFields(). Do not require a "Slug" field id.
 
   const gameField = hacksFieldsByName.get("Game");
   if (!gameField || gameField.type !== "collectionReference") {
