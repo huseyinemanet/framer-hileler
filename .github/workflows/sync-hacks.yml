@@ -40,7 +40,7 @@ jobs:
           STRICT_GAME_RELATION: ${{ vars.STRICT_GAME_RELATION || 'true' }}
           SYNC_SOURCE: ${{ vars.SYNC_SOURCE || 'file' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-3-5-haiku-20241022' }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001' }}
           HACKS_PER_GAME_THRESHOLD: ${{ vars.HACKS_PER_GAME_THRESHOLD || '3' }}
           AI_CHEATS_PER_RUN: ${{ vars.AI_CHEATS_PER_RUN || '2' }}
           AI_ROTATION_GRANULARITY: ${{ vars.AI_ROTATION_GRANULARITY || 'daily' }}

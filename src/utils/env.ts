@@ -17,8 +17,8 @@ const envSchema = z.object({
   /** file: JSON input; ai: eşik + rotasyon ile oyun seç, Anthropic üret */
   SYNC_SOURCE: z.enum(["file", "ai"]).default("file"),
   ANTHROPIC_API_KEY: z.string().optional(),
-  /** Örn. claude-3-5-haiku-20241022 — güncel listeyi Anthropic konsolundan doğrula */
-  ANTHROPIC_MODEL: z.string().default("claude-3-5-haiku-20241022"),
+  /** Geçerli model id (hesaba göre değişir). 404 alırsan konsolda veya GET /v1/models ile doğrula. */
+  ANTHROPIC_MODEL: z.string().default("claude-haiku-4-5-20251001"),
   /** Bu oyuna bağlı hile sayısı bu değerin altındaysa AI hedef adayı */
   HACKS_PER_GAME_THRESHOLD: z
     .string()

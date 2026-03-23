@@ -19,7 +19,7 @@ Varsayılan çalışma modu **dry-run**'dır. Yazma yapmak için `--write` zorun
 - `STRICT_GAME_RELATION` (`true|false`)
 - `SYNC_INPUT_PATH` (default: `./data/sample-cheats.json`)
 - `SYNC_SOURCE` (`file` | `ai`) — `ai` ise CLI’da `--ai` olmadan da AI modu (override: `--file`)
-- `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` (AI modu; model adını Anthropic konsolundan doğrula)
+- `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` (AI modu; yanlış id için API `404 not_found_error` verir — [Anthropic](https://console.anthropic.com/) veya `GET https://api.anthropic.com/v1/models` ile doğrula)
 - `HACKS_PER_GAME_THRESHOLD` — oyuna bağlı hile sayısı bundan küçükse öncelikli aday
 - `AI_CHEATS_PER_RUN` — her koşuda üretilecek kayıt sayısı
 - `AI_ROTATION_GRANULARITY` (`daily` | `hourly` | `random`) — aynı gün/saat içinde hangi oyunun sırası geldiği
